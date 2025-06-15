@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hanzi Writer – Sentence Practice</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Additional layout tweaks for sentence demo */
+      .sentence-input {
+        width: 100%;
+        padding: 0.5rem;
+        font-size: 1.2rem;
+      }
+      .char-list {
+        margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .char-button {
+        padding: 0.5rem 0.75rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        background: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .char-button.active {
+        background: #166E16;
+        color: #fff;
+      }
+      .writer-container {
+        margin-top: 1.5rem;
+      }
+      .controls {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .controls button {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        background: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .controls button:hover {
+        background: #e0e0e0;
+      }
+      .progress {
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        color: #666;
+      }
+    </style>
+    <!-- Polyfills for IE11 / old browsers -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <!-- Pull Hanzi Writer from jsdelivr CDN so dist build is not required locally -->
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@latest/dist/hanzi-writer.min.js"></script>
+  </head>
+  <body>
+    <h1 class="title">Hanzi Writer – Sentence Practice</h1>
+
+    <form class="js-sentence-form">
+      <label>
+        Sentence
+        <input type="text" class="sentence-input js-sentence" placeholder="输入中文句子" />
+      </label>
+      <button type="submit">Start</button>
+    </form>
+
+    <div class="char-list js-char-list"></div>
+
+    <div class="progress js-progress"></div>
+
+    <div class="controls js-controls" style="display: none;">
+      <button class="js-animate">Show Animation</button>
+      <button class="js-quiz">Practice Writing</button>
+      <button class="js-next">Next Character</button>
+      <button class="js-prev">Previous Character</button>
+      <button class="js-toggle-outline">Toggle Outline</button>
+      <button class="js-toggle-char">Toggle Character</button>
+      <button class="js-loop">Loop Animation</button>
+    </div>
+
+    <div class="writer-container">
+      <div id="sentence-writer"></div>
+    </div>
+
+    <script type="application/javascript">
+      (function () {
+        const charListEl = document.querySelector('.js-char-list');
+        const sentenceInput = document.querySelector('.js-sentence');
+        const form = document.querySelector('.js-sentence-form');
+        const progressEl = document.querySelector('.js-progress');
+        const controlsEl = document.querySelector('.js-controls');
+        let writer;
+        let currentIndex = 0;
+        let chars = [];
+
+        function extractChars(str) {
+          // Same regex used in src/sentenceUtils.ts – duplicated here for simplicity in browser.
+          return (str.match(/[\u4E00-\u9FFF]/g) || []);
+        }
+
+        function createWriter(char) {
+          // Clear previous writer
+          const writerContainer = document.querySelector('.writer-container');
+          writerContainer.innerHTML = '<div id="sentence-writer"></div>';
+          
+          // Render new writer instance – make character visible by default so
+          // users immediately see it before interacting with controls.
+          writer = HanziWriter.create('sentence-writer', char, {
+            width: 300,
+            height: 300,
+            renderer: 'svg',
+            radicalColor: '#166E16',
+            showCharacter: true, // show the character strokes
+            showOutline: false,  // outline hidden until user toggles
+          });
+        }
+
+        function updateProgress() {
+          progressEl.textContent = `Character ${currentIndex + 1} of ${chars.length}: ${chars[currentIndex]}`;
+        }
+
+        function updateActiveButton() {
+          const buttons = charListEl.querySelectorAll('.char-button');
+          buttons.forEach((btn, idx) => {
+            btn.classList.toggle('active', idx === currentIndex);
+          });
+        }
+
+        function goToCharacter(index) {
+          if (index >= 0 && index < chars.length) {
+            currentIndex = index;
+            createWriter(chars[currentIndex]);
+            updateActiveButton();
+            updateProgress();
+          }
+        }
+
+        function buildCharButtons() {
+          charListEl.innerHTML = '';
+          chars.forEach((char, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = char;
+            btn.className = 'char-button';
+            btn.addEventListener('click', () => goToCharacter(idx));
+            charListEl.appendChild(btn);
+          });
+          updateActiveButton();
+        }
+
+        document.querySelector('.js-animate').addEventListener('click', () => {
+          if (!writer) return;
+          writer.animateCharacter();
+        });
+
+        document.querySelector('.js-quiz').addEventListener('click', () => {
+          if (writer) {
+            writer.quiz({
+              showOutline: true,
+              onComplete: () => {
+                alert('Great job! Click "Next Character" to continue.');
+              }
+            });
+          }
+        });
+
+        document.querySelector('.js-next').addEventListener('click', () => {
+          goToCharacter(currentIndex + 1);
+        });
+
+        document.querySelector('.js-prev').addEventListener('click', () => {
+          goToCharacter(currentIndex - 1);
+        });
+
+        document.querySelector('.js-toggle-outline').addEventListener('click', () => {
+          if (writer) {
+            writer.isOutlineVisible = writer.isOutlineVisible === undefined ? false : writer.isOutlineVisible;
+            if (writer.isOutlineVisible) {
+              writer.hideOutline();
+            } else {
+              writer.showOutline();
+            }
+            writer.isOutlineVisible = !writer.isOutlineVisible;
+          }
+        });
+
+        document.querySelector('.js-toggle-char').addEventListener('click', () => {
+          if (writer) {
+            writer.isCharVisible = writer.isCharVisible === undefined ? false : writer.isCharVisible;
+            if (writer.isCharVisible) {
+              writer.hideCharacter();
+            } else {
+              writer.showCharacter();
+            }
+            writer.isCharVisible = !writer.isCharVisible;
+          }
+        });
+
+        let loopHandle = null;
+        document.querySelector('.js-loop').addEventListener('click', (evt) => {
+          if (!writer) return;
+          if (loopHandle) {
+            // Stop looping
+            writer.pauseAnimation();
+            clearInterval(loopHandle);
+            loopHandle = null;
+            evt.target.textContent = 'Loop Animation';
+          } else {
+            writer.animateCharacter();
+            loopHandle = setInterval(() => {
+              writer.animateCharacter();
+            }, 3500); // approximate interval
+            evt.target.textContent = 'Stop Loop';
+          }
+        });
+
+        form.addEventListener('submit', (evt) => {
+          evt.preventDefault();
+          chars = extractChars(sentenceInput.value);
+          if (!chars.length) {
+            alert('请先输入包含中文字符的句子');
+            return;
+          }
+          currentIndex = 0;
+          buildCharButtons();
+          createWriter(chars[currentIndex]);
+          updateProgress();
+          controlsEl.style.display = 'flex';
+        });
+      })();
+    </script>
+  </body>
+</html> 
