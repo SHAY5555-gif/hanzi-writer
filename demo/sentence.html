@@ -2,56 +2,73 @@
 <html lang="en-us">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hanzi Writer – Sentence Practice</title>
     <link rel="stylesheet" href="styles.css" />
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
       /* Additional layout tweaks for sentence demo */
       .sentence-input {
         width: 100%;
-        padding: 0.5rem;
-        font-size: 1.2rem;
+        padding: 1rem 1.25rem;
+        font-size: 1.25rem;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(5px);
       }
-      .char-list {
-        margin-top: 1rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+      
+      /* Floating particles animation */
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
       }
-      .char-button {
-        padding: 0.5rem 0.75rem;
-        font-size: 1.2rem;
-        cursor: pointer;
-        background: #eee;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+      
+      .particle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 50%;
+        animation: floatUp 20s infinite;
       }
-      .char-button.active {
-        background: #166E16;
-        color: #fff;
+      
+      @keyframes floatUp {
+        0% {
+          transform: translateY(100vh) scale(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) scale(1.5);
+          opacity: 0;
+        }
       }
-      .writer-container {
-        margin-top: 1.5rem;
-      }
-      .controls {
-        margin-top: 1rem;
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-      .controls button {
-        padding: 0.5rem 1rem;
-        cursor: pointer;
-        background: #f0f0f0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-      .controls button:hover {
-        background: #e0e0e0;
-      }
-      .progress {
-        margin-top: 1rem;
+      
+      /* Icon styles */
+      .btn-icon {
         font-size: 1.1rem;
-        color: #666;
+        margin-right: 0.5rem;
+      }
+      
+      /* Success animation */
+      @keyframes success {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+      }
+      
+      .success-animation {
+        animation: success 0.5s ease-in-out;
       }
     </style>
     <!-- Polyfills for IE11 / old browsers -->
@@ -60,36 +77,72 @@
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@latest/dist/hanzi-writer.min.js"></script>
   </head>
   <body>
-    <h1 class="title">Hanzi Writer – Sentence Practice</h1>
+    <!-- Animated particles background -->
+    <div class="particles" id="particles"></div>
+    
+    <h1 class="title">
+      <i class="fas fa-pen-fancy"></i> Hanzi Writer – Sentence Practice
+    </h1>
 
-    <form class="js-sentence-form">
-      <label>
-        Sentence
-        <input type="text" class="sentence-input js-sentence" placeholder="输入中文句子" />
-      </label>
-      <button type="submit">Start</button>
-    </form>
+    <div class="container">
+      <div class="card">
+        <form class="js-sentence-form">
+          <label>
+            <span><i class="fas fa-language"></i> Enter Chinese Sentence</span>
+            <input type="text" class="sentence-input js-sentence" placeholder="输入中文句子..." />
+          </label>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-play btn-icon"></i>Start Practice
+          </button>
+        </form>
+      </div>
 
-    <div class="char-list js-char-list"></div>
+      <div class="char-list js-char-list"></div>
 
-    <div class="progress js-progress"></div>
+      <div class="progress js-progress"></div>
 
-    <div class="controls js-controls" style="display: none;">
-      <button class="js-animate">Show Animation</button>
-      <button class="js-quiz">Practice Writing</button>
-      <button class="js-next">Next Character</button>
-      <button class="js-prev">Previous Character</button>
-      <button class="js-toggle-outline">Toggle Outline</button>
-      <button class="js-toggle-char">Toggle Character</button>
-      <button class="js-loop">Loop Animation</button>
-    </div>
+      <div class="controls js-controls" style="display: none;">
+        <button class="js-animate btn-secondary" data-tooltip="Show character stroke animation">
+          <i class="fas fa-film btn-icon"></i>Show Animation
+        </button>
+        <button class="js-quiz btn-accent" data-tooltip="Practice writing this character">
+          <i class="fas fa-pencil-alt btn-icon"></i>Practice Writing
+        </button>
+        <button class="js-next btn-primary" data-tooltip="Go to next character">
+          <i class="fas fa-chevron-right btn-icon"></i>Next
+        </button>
+        <button class="js-prev btn-primary" data-tooltip="Go to previous character">
+          <i class="fas fa-chevron-left btn-icon"></i>Previous
+        </button>
+        <button class="js-toggle-outline btn-secondary" data-tooltip="Show/hide character outline">
+          <i class="fas fa-border-all btn-icon"></i>Toggle Outline
+        </button>
+        <button class="js-toggle-char btn-secondary" data-tooltip="Show/hide character strokes">
+          <i class="fas fa-eye btn-icon"></i>Toggle Character
+        </button>
+        <button class="js-loop btn-accent" data-tooltip="Loop the animation continuously">
+          <i class="fas fa-sync btn-icon"></i>Loop Animation
+        </button>
+      </div>
 
-    <div class="writer-container">
-      <div id="sentence-writer"></div>
+      <div class="writer-container">
+        <div id="sentence-writer"></div>
+      </div>
     </div>
 
     <script type="application/javascript">
       (function () {
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.animationDelay = Math.random() * 20 + 's';
+          particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+          particlesContainer.appendChild(particle);
+        }
+        
         const charListEl = document.querySelector('.js-char-list');
         const sentenceInput = document.querySelector('.js-sentence');
         const form = document.querySelector('.js-sentence-form');
@@ -118,11 +171,19 @@
             radicalColor: '#166E16',
             showCharacter: true, // show the character strokes
             showOutline: false,  // outline hidden until user toggles
+            strokeAnimationSpeed: 1,
+            delayBetweenStrokes: 50,
+            strokeColor: '#555',
+            strokeWidth: 4,
           });
         }
 
         function updateProgress() {
-          progressEl.textContent = `Character ${currentIndex + 1} of ${chars.length}: ${chars[currentIndex]}`;
+          progressEl.innerHTML = `
+            <i class="fas fa-tasks"></i> 
+            Character <strong>${currentIndex + 1}</strong> of <strong>${chars.length}</strong>: 
+            <span style="font-size: 1.5rem; color: var(--primary);">${chars[currentIndex]}</span>
+          `;
         }
 
         function updateActiveButton() {
@@ -148,6 +209,7 @@
             btn.type = 'button';
             btn.textContent = char;
             btn.className = 'char-button';
+            btn.setAttribute('data-tooltip', `Character ${idx + 1}`);
             btn.addEventListener('click', () => goToCharacter(idx));
             charListEl.appendChild(btn);
           });
@@ -164,7 +226,35 @@
             writer.quiz({
               showOutline: true,
               onComplete: () => {
-                alert('Great job! Click "Next Character" to continue.');
+                // Add success animation
+                const writerEl = document.getElementById('sentence-writer');
+                writerEl.classList.add('success-animation');
+                setTimeout(() => {
+                  writerEl.classList.remove('success-animation');
+                }, 500);
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.innerHTML = '<i class="fas fa-check-circle"></i> Great job! Click "Next" to continue.';
+                successMsg.style.cssText = `
+                  position: fixed;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  background: var(--gradient-accent);
+                  color: white;
+                  padding: 1.5rem 3rem;
+                  border-radius: var(--radius-xl);
+                  box-shadow: var(--shadow-2xl);
+                  font-size: 1.2rem;
+                  font-weight: 600;
+                  z-index: 1000;
+                  animation: fadeIn 0.3s ease-in-out;
+                `;
+                document.body.appendChild(successMsg);
+                setTimeout(() => {
+                  successMsg.remove();
+                }, 3000);
               }
             });
           }
@@ -178,25 +268,29 @@
           goToCharacter(currentIndex - 1);
         });
 
-        document.querySelector('.js-toggle-outline').addEventListener('click', () => {
+        document.querySelector('.js-toggle-outline').addEventListener('click', (evt) => {
           if (writer) {
             writer.isOutlineVisible = writer.isOutlineVisible === undefined ? false : writer.isOutlineVisible;
             if (writer.isOutlineVisible) {
               writer.hideOutline();
+              evt.currentTarget.querySelector('.btn-icon').className = 'fas fa-border-none btn-icon';
             } else {
               writer.showOutline();
+              evt.currentTarget.querySelector('.btn-icon').className = 'fas fa-border-all btn-icon';
             }
             writer.isOutlineVisible = !writer.isOutlineVisible;
           }
         });
 
-        document.querySelector('.js-toggle-char').addEventListener('click', () => {
+        document.querySelector('.js-toggle-char').addEventListener('click', (evt) => {
           if (writer) {
-            writer.isCharVisible = writer.isCharVisible === undefined ? false : writer.isCharVisible;
+            writer.isCharVisible = writer.isCharVisible === undefined ? true : writer.isCharVisible;
             if (writer.isCharVisible) {
               writer.hideCharacter();
+              evt.currentTarget.querySelector('.btn-icon').className = 'fas fa-eye-slash btn-icon';
             } else {
               writer.showCharacter();
+              evt.currentTarget.querySelector('.btn-icon').className = 'fas fa-eye btn-icon';
             }
             writer.isCharVisible = !writer.isCharVisible;
           }
@@ -205,18 +299,25 @@
         let loopHandle = null;
         document.querySelector('.js-loop').addEventListener('click', (evt) => {
           if (!writer) return;
+          const icon = evt.currentTarget.querySelector('.btn-icon');
           if (loopHandle) {
             // Stop looping
             writer.pauseAnimation();
             clearInterval(loopHandle);
             loopHandle = null;
-            evt.target.textContent = 'Loop Animation';
+            evt.currentTarget.innerHTML = '<i class="fas fa-sync btn-icon"></i>Loop Animation';
+            icon.classList.remove('fa-spin');
           } else {
             writer.animateCharacter();
             loopHandle = setInterval(() => {
               writer.animateCharacter();
             }, 3500); // approximate interval
-            evt.target.textContent = 'Stop Loop';
+            evt.currentTarget.innerHTML = '<i class="fas fa-pause btn-icon"></i>Stop Loop';
+            // Add spinning animation to icon
+            setTimeout(() => {
+              const newIcon = evt.currentTarget.querySelector('.btn-icon');
+              if (newIcon) newIcon.classList.add('fa-spin');
+            }, 10);
           }
         });
 
@@ -224,7 +325,38 @@
           evt.preventDefault();
           chars = extractChars(sentenceInput.value);
           if (!chars.length) {
-            alert('请先输入包含中文字符的句子');
+            // Show error message with animation
+            const errorMsg = document.createElement('div');
+            errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> 请先输入包含中文字符的句子';
+            errorMsg.style.cssText = `
+              position: fixed;
+              top: 20%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+              color: white;
+              padding: 1rem 2rem;
+              border-radius: var(--radius-lg);
+              box-shadow: var(--shadow-xl);
+              font-size: 1.1rem;
+              z-index: 1000;
+              animation: shake 0.5s ease-in-out;
+            `;
+            document.body.appendChild(errorMsg);
+            setTimeout(() => {
+              errorMsg.remove();
+            }, 3000);
+            
+            // Add shake animation
+            const style = document.createElement('style');
+            style.textContent = `
+              @keyframes shake {
+                0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+                25% { transform: translate(-48%, -50%) rotate(-2deg); }
+                75% { transform: translate(-52%, -50%) rotate(2deg); }
+              }
+            `;
+            document.head.appendChild(style);
             return;
           }
           currentIndex = 0;
@@ -232,6 +364,9 @@
           createWriter(chars[currentIndex]);
           updateProgress();
           controlsEl.style.display = 'flex';
+          
+          // Smooth scroll to character list
+          charListEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
       })();
     </script>
