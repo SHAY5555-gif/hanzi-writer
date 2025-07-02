@@ -303,22 +303,19 @@
           }
         });
 
-        let loopHandle = null;
+        let isLooping = false;
         document.querySelector('.js-loop').addEventListener('click', (evt) => {
           if (!writer) return;
           const icon = evt.currentTarget.querySelector('.btn-icon');
-          if (loopHandle) {
+          if (isLooping) {
             // Stop looping
             writer.pauseAnimation();
-            clearInterval(loopHandle);
-            loopHandle = null;
+            isLooping = false;
             evt.currentTarget.innerHTML = '<i class="fas fa-sync btn-icon"></i>Loop Animation';
             icon.classList.remove('fa-spin');
           } else {
-            writer.animateCharacter();
-            loopHandle = setInterval(() => {
-              writer.animateCharacter();
-            }, 3500); // approximate interval
+            writer.loopCharacterAnimation();
+            isLooping = true;
             evt.currentTarget.innerHTML = '<i class="fas fa-pause btn-icon"></i>Stop Loop';
             // Add spinning animation to icon
             setTimeout(() => {
@@ -378,4 +375,4 @@
       })();
     </script>
   </body>
-</html> 
+</html>

@@ -156,6 +156,9 @@
         <button class="js-animate btn-secondary" data-tooltip="Show character stroke animation">
           <i class="fas fa-film btn-icon"></i>Animate
         </button>
+        <button class="js-loop btn-secondary" data-tooltip="Loop character stroke animation">
+          <i class="fas fa-infinity btn-icon"></i>Loop Animation
+        </button>
         <button class="js-quiz btn-accent" data-tooltip="Practice writing this character">
           <i class="fas fa-pencil-alt btn-icon"></i>Practice Quiz
         </button>
@@ -388,6 +391,10 @@
         document.querySelector('.js-animate').addEventListener('click', function () {
           writer.animateCharacter();
         });
+
+        document.querySelector('.js-loop').addEventListener('click', function () {
+          writer.loopCharacterAnimation();
+        });
         
         document.querySelector('.js-quiz').addEventListener('click', function () {
           document.querySelector('#writer-container').classList.add('practicing');
@@ -398,4 +405,4 @@
       };
     </script>
   </body>
-</html> 
+</html>
