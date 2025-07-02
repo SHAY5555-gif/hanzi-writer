@@ -32,8 +32,8 @@ export default class UserStrokeRenderer {
         fill: 'none',
         stroke: `rgba(${r},${g},${b},${a})`,
         'stroke-width': props.strokeWidth.toString(),
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round',
+        'stroke-linecap': 'butt',
+        'stroke-linejoin': 'miter',
       });
     }
     if (props.opacity !== this._oldProps?.opacity) {

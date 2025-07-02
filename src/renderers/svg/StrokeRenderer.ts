@@ -44,7 +44,7 @@ export default class StrokeRenderer extends StrokeRendererBase {
       stroke: '#FFFFFF',
       'stroke-width': STROKE_WIDTH.toString(),
       fill: 'none',
-      'stroke-linecap': 'round',
+      'stroke-linecap': 'butt',
       'stroke-linejoin': 'miter',
       'stroke-dasharray': `${this._pathLength},${this._pathLength}`,
     });

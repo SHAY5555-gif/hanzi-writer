@@ -110,10 +110,8 @@
         }
       }
     </style>
-    <!-- Polyfills for IE11 / old browsers -->
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
     <!-- Pull Hanzi Writer from jsdelivr CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@latest/dist/hanzi-writer.min.js"></script>
+    <script src="hanzi-writer.min.js"></script>
   </head>
   <body>
     <!-- Animated particles background -->
@@ -281,9 +279,12 @@
         writer = HanziWriter.create('target', character, {
           width: 300,
           height: 300,
-          renderer: 'svg',
+          padding: 5,
+          showCharacter: true,
+          charDataLoader: function(c,onLoad,onErr){
+            fetch('data_hzw/'+encodeURIComponent(c)+'.json').then(r=>r.ok?r.json():Promise.reject()).then(onLoad).catch(()=>HanziWriter.loadCharacterData(c,{ }).then(onLoad).catch(onErr));
+          },
           radicalColor: '#166E16',
-          strokeColor: '#555',
           strokeWidth: 4,
           onCorrectStroke: function(data) {
             printStrokePoints(data);
@@ -323,7 +324,6 @@
               successMsg.remove();
             }, 3000);
           },
-          showCharacter: true,
           showOutline: true,
         });
         isCharVisible = true;

@@ -29,6 +29,7 @@
     "jest-fetch-mock": "^3.0.3",
     "nise": "^4.0.4",
     "prettier": "^2.2.1",
+    "rimraf": "^5.0.1",
     "rollup": "^2.36.2",
     "rollup-plugin-filesize": "^9.1.0",
     "rollup-plugin-license": "^2.2.0",
@@ -40,8 +41,8 @@
     "test": "jest",
     "lint-test": "eslint -c .eslintrc src",
     "lint-fix": "eslint --fix --ext .tsx,.ts .",
-    "build": "rm -rf dist && rollup -c",
-    "prepublishOnly": "rollup -c",
+    "build": "rimraf dist && rollup -c",
+    "prepublishOnly": "rimraf dist && rollup -c",
     "semantic-release": "semantic-release",
     "prettier": "prettier -w src",
     "typecheck": "tsc --noEmit --skipLibCheck"
@@ -62,5 +63,7 @@
     "collectCoverage": true,
     "testEnvironment": "<rootDir>/../jest-jsdom-env"
   },
-  "dependencies": {}
+  "dependencies": {
+    "hanzi-writer-data-jp": "^0.0.2"
+  }
 }

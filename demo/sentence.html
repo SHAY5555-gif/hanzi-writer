@@ -71,10 +71,8 @@
         animation: success 0.5s ease-in-out;
       }
     </style>
-    <!-- Polyfills for IE11 / old browsers -->
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
     <!-- Pull Hanzi Writer from jsdelivr CDN so dist build is not required locally -->
-    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@latest/dist/hanzi-writer.min.js"></script>
+    <script src="hanzi-writer.min.js"></script>
   </head>
   <body>
     <!-- Animated particles background -->
@@ -169,12 +167,21 @@
             height: 300,
             renderer: 'svg',
             radicalColor: '#166E16',
-            showCharacter: true, // show the character strokes
-            showOutline: false,  // outline hidden until user toggles
+            showCharacter: true,
+            showOutline: false,
             strokeAnimationSpeed: 1,
             delayBetweenStrokes: 50,
             strokeColor: '#555',
             strokeWidth: 4,
+            charDataLoader: function(c,onLoad,onErr){
+              fetch('data_hzw/' + encodeURIComponent(c) + '.json')
+                .then(r=>r.ok?r.json():Promise.reject())
+                .then(onLoad)
+                .catch(()=>{
+                  // fallback to default loader (CDN)
+                  HanziWriter.loadCharacterData(c).then(onLoad).catch(onErr);
+                });
+            }
           });
         }
 

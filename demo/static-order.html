@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Static Stroke-Order Viewer</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:20px;background:#f0f3ff;color:#222}
+    h1{margin-top:0}
+    #chars{width:100%;max-width:400px;font-size:24px;padding:8px}
+    #render-btn{padding:8px 18px;font-size:18px;cursor:pointer;margin-left:8px}
+    .svg-container{display:inline-block;margin:12px;border:1px solid #ccc;padding:4px;background:#fff}
+    .svg-container svg{width:150px;height:150px}
+  </style>
+</head>
+<body>
+  <h1>Static Stroke-Order (no animation)</h1>
+  <input id="chars" placeholder="Enter Chinese characters" />
+  <button id="render-btn">Render</button>
+  <div id="output"></div>
+
+<script>
+const fetchCharData = (char) => {
+  // try local dataset first
+  return fetch('data_hzw/' + encodeURIComponent(char) + '.json')
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .catch(() => fetch('https://cdn.jsdelivr.net/npm/hanzi-writer-data@latest/'+ encodeURIComponent(char)+'.json').then(r=>r.json()));
+};
+
+function createStaticSVG(char, data){
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS,'svg');
+  svg.setAttribute('viewBox','0 0 1024 1024');
+  const g = document.createElementNS(svgNS,'g');
+  g.setAttribute('transform','scale(1,-1) translate(0,-900)');
+  svg.appendChild(g);
+
+  // draw strokes
+  data.strokes.forEach((d,i)=>{
+    const p=document.createElementNS(svgNS,'path');
+    p.setAttribute('d',d);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke','#555');
+    p.setAttribute('stroke-width','60');
+    p.setAttribute('stroke-linecap','butt');
+    g.appendChild(p);
+
+    // number label
+    const [x,y] = data.medians[i][0];
+    const text=document.createElementNS(svgNS,'text');
+    text.setAttribute('x',x);
+    text.setAttribute('y',y-20); // lift number a bit
+    text.setAttribute('font-size','80');
+    text.setAttribute('fill','red');
+    text.setAttribute('stroke','white');
+    text.setAttribute('stroke-width','10');
+    text.setAttribute('paint-order','stroke');
+    text.textContent = i+1;
+    g.appendChild(text);
+  });
+  return svg;
+}
+
+document.getElementById('render-btn').addEventListener('click',()=>{
+  const chars = document.getElementById('chars').value.trim();
+  const out = document.getElementById('output');
+  out.innerHTML='';
+  [...chars].forEach(ch=>{
+    const wrapper=document.createElement('div');
+    wrapper.className='svg-container';
+    out.appendChild(wrapper);
+    fetchCharData(ch).then(data=>{
+      wrapper.appendChild(createStaticSVG(ch,data));
+    }).catch(()=>{
+      wrapper.textContent = 'No data for '+ch;
+    });
+  });
+});
+</script>
+</body>
+</html> 

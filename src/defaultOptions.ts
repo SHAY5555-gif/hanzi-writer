@@ -1,8 +1,8 @@
 import { HanziWriterOptions } from './typings/types';
-import defaultCharDataLoader from './defaultCharDataLoader';
+import hybridCharDataLoader from './charDataHybridLoader';
 
 const defaultOptions: HanziWriterOptions = {
-  charDataLoader: defaultCharDataLoader,
+  charDataLoader: hybridCharDataLoader,
   onLoadCharDataError: null,
   onLoadCharDataSuccess: null,
   showOutline: true,
@@ -17,12 +17,12 @@ const defaultOptions: HanziWriterOptions = {
 
   // animation options
 
-  strokeAnimationSpeed: 1,
-  strokeFadeDuration: 400,
-  strokeHighlightDuration: 200,
-  strokeHighlightSpeed: 2,
-  delayBetweenStrokes: 1000,
-  delayBetweenLoops: 2000,
+  strokeAnimationSpeed: 0.5,
+  strokeFadeDuration: 600,
+  strokeHighlightDuration: 300,
+  strokeHighlightSpeed: 1,
+  delayBetweenStrokes: 1200,
+  delayBetweenLoops: 2500,
 
   // colors
 

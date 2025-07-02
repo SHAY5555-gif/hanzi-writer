@@ -191,6 +191,10 @@ export const animateCharacterLoop = (
   delayBetweenStrokes: number,
   delayBetweenLoops: number,
 ): GenericMutation[] => {
+  // DEBUG: log start of loop
+  if (typeof console !== 'undefined' && console.log) {
+    console.log('[DEBUG] animateCharacterLoop: start loop');
+  }
   const mutations = animateCharacter(
     charName,
     character,
@@ -199,5 +203,9 @@ export const animateCharacterLoop = (
     delayBetweenStrokes,
   );
   mutations.push(new Mutation.Delay(delayBetweenLoops));
+  // DEBUG: log end of loop
+  if (typeof console !== 'undefined' && console.log) {
+    console.log('[DEBUG] animateCharacterLoop: end loop');
+  }
   return mutations;
 };
