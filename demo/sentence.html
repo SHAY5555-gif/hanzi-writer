@@ -71,21 +71,38 @@
         animation: success 0.5s ease-in-out;
       }
 
-      /* Pinyin styles */
-      .char-button {
+      /* Pinyin styles - enhanced layout */
+      .pinyin-display {
         display: flex;
-        flex-direction: column;
         align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        margin: 1rem 0;
+        border: 2px solid var(--gray-100);
+        transition: var(--transition-base);
       }
-      .char-button .pinyin {
-        font-size: 0.7rem;
-        color: var(--text-secondary);
-        line-height: 1rem;
+      
+      .pinyin-display:hover {
+        border-color: var(--primary-light);
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
       }
-      .pinyin-big {
-        margin-left: 0.5rem;
-        font-size: 1.1rem;
-        color: var(--text-secondary);
+      
+      .pinyin-display .hanzi-large {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+      }
+      
+      .pinyin-display .pinyin-large {
+        font-size: 1.25rem;
+        color: var(--text-accent);
+        font-weight: 500;
+        letter-spacing: 0.05em;
       }
     </style>
     <!-- Pinyin-pro local bundle -->
@@ -222,7 +239,7 @@
             },
             charDataLoader: function(c,onLoad,onErr){
               if (charDataCache.has(c)) { onLoad(charDataCache.get(c)); return; }
-              fetch('data_hzw/' + encodeURIComponent(c) + '.json')
+              fetch('../data_hzw/' + encodeURIComponent(c) + '.json')
                 .then(r=>r.ok?r.json():Promise.reject())
                 .then(onLoad)
                 .catch(()=>{
@@ -234,10 +251,15 @@
         }
 
         function updateProgress() {
+          const currentChar = chars[currentIndex];
+          const currentPinyin = pinyins[currentIndex];
           progressEl.innerHTML = `
             <i class="fas fa-tasks"></i> 
-            Character <strong>${currentIndex + 1}</strong> of <strong>${chars.length}</strong>: 
-            <span style="font-size: 1.5rem; color: var(--primary);">${chars[currentIndex]}</span>
+            Character <strong>${currentIndex + 1}</strong> of <strong>${chars.length}</strong>
+            <div class="pinyin-display">
+              <span class="hanzi-large">${currentChar}</span>
+              <span class="pinyin-large">${currentPinyin}</span>
+            </div>
           `;
         }
 
