@@ -5,6 +5,10 @@ import Mutation, { GenericMutation } from './Mutation';
 import { objRepeat } from './utils';
 import { CharacterName, CharacterRenderState, RenderStateObject } from './RenderState';
 
+const EXTRA_MS = 600;
+const SPEED_DIVISOR = 3;
+const DEBUG = true;
+
 export const showStrokes = (
   charName: CharacterName,
   character: Character,
@@ -64,7 +68,7 @@ export const highlightStroke = (
   speed: number,
 ): GenericMutation[] => {
   const strokeNum = stroke.strokeNum;
-  const duration = (stroke.getLength() + 600) / (3 * speed);
+  const duration = (stroke.getLength() + EXTRA_MS) / (SPEED_DIVISOR * speed);
   return [
     new Mutation('options.highlightColor', color),
     new Mutation('character.highlight', {
@@ -97,7 +101,7 @@ export const animateStroke = (
   speed: number,
 ): GenericMutation[] => {
   const strokeNum = stroke.strokeNum;
-  const duration = (stroke.getLength() + 600) / (3 * speed);
+  const duration = (stroke.getLength() + EXTRA_MS) / (SPEED_DIVISOR * speed);
   return [
     new Mutation(`character.${charName}`, {
       opacity: 1,
@@ -192,7 +196,7 @@ export const animateCharacterLoop = (
   delayBetweenLoops: number,
 ): GenericMutation[] => {
   // DEBUG: log start of loop
-  if (typeof console !== 'undefined' && console.log) {
+  if (DEBUG && typeof console !== 'undefined' && console.log) {
     console.log('[DEBUG] animateCharacterLoop: start loop');
   }
   const mutations = animateCharacter(
@@ -204,7 +208,7 @@ export const animateCharacterLoop = (
   );
   mutations.push(new Mutation.Delay(delayBetweenLoops));
   // DEBUG: log end of loop
-  if (typeof console !== 'undefined' && console.log) {
+  if (DEBUG && typeof console !== 'undefined' && console.log) {
     console.log('[DEBUG] animateCharacterLoop: end loop');
   }
   return mutations;

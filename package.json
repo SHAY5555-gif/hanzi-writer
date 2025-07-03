@@ -44,7 +44,7 @@
     "build": "rimraf dist && rollup -c",
     "prepublishOnly": "rimraf dist && rollup -c",
     "semantic-release": "semantic-release",
-    "prettier": "prettier -w src",
+    "prettier": "prettier -w \"src/**/*.{ts,tsx,js,jsx,html,css}\" \"demo/**/*.{html,css,js}\"",
     "typecheck": "tsc --noEmit --skipLibCheck"
   },
   "files": [

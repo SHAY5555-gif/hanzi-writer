@@ -149,10 +149,27 @@
         let writer;
         let currentIndex = 0;
         let chars = [];
+        const charDataCache = new Map();
 
         function extractChars(str) {
           // Same regex used in src/sentenceUtils.ts – duplicated here for simplicity in browser.
           return (str.match(/[\u4E00-\u9FFF]/g) || []);
+        }
+
+        async function prefetchCharData(charArr) {
+          const uncached = charArr.filter(c => !charDataCache.has(c));
+          await Promise.all(
+            uncached.map(c =>
+              fetch('../data_hzw/' + encodeURIComponent(c) + '.json')
+                .then(r => (r.ok ? r.json() : Promise.reject()))
+                .then(data => charDataCache.set(c, data))
+                .catch(() => {})
+            )
+          );
+        }
+
+        function getWriterSize() {
+          return Math.min(300, Math.round(window.innerWidth * 0.8));
         }
 
         function createWriter(char) {
@@ -163,8 +180,8 @@
           // Render new writer instance – make character visible by default so
           // users immediately see it before interacting with controls.
           writer = HanziWriter.create('sentence-writer', char, {
-            width: 300,
-            height: 300,
+            width: getWriterSize(),
+            height: getWriterSize(),
             renderer: 'svg',
             radicalColor: '#166E16',
             showCharacter: true,
@@ -173,7 +190,17 @@
             delayBetweenStrokes: 50,
             strokeColor: '#555',
             strokeWidth: 4,
+            // resize on viewport change
+            onLoad: () => {
+              window.addEventListener('resize', () => {
+                if (writer) {
+                  const size = getWriterSize();
+                  writer.updateDimensions({ width: size, height: size });
+                }
+              });
+            },
             charDataLoader: function(c,onLoad,onErr){
+              if (charDataCache.has(c)) { onLoad(charDataCache.get(c)); return; }
               fetch('data_hzw/' + encodeURIComponent(c) + '.json')
                 .then(r=>r.ok?r.json():Promise.reject())
                 .then(onLoad)
@@ -325,9 +352,10 @@
           }
         });
 
-        form.addEventListener('submit', (evt) => {
+        form.addEventListener('submit', async (evt) => {
           evt.preventDefault();
           chars = extractChars(sentenceInput.value);
+          await prefetchCharData(chars);
           if (!chars.length) {
             // Show error message with animation
             const errorMsg = document.createElement('div');

@@ -1,7 +1,13 @@
 {
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "html"],
+  "overrides": [
+    {
+      "files": ["*.html"],
+      "processor": "html/html"
+    }
+  ],
   "ignorePatterns": [
     "dist/*",
     "build/*",
