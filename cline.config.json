@@ -1,0 +1,7 @@
+{
+  "systemPrompt": "./.clinerules/system-instructions.md",
+  "model": "claude-sonnet-4-20250514",
+  "verbose": true,
+  "outputFormat": "stream-json",
+  "maxTurns": 1
+}
