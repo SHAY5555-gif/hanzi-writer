@@ -70,7 +70,27 @@
       .success-animation {
         animation: success 0.5s ease-in-out;
       }
+
+      /* Pinyin styles */
+      .char-button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .char-button .pinyin {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        line-height: 1rem;
+      }
+      .pinyin-big {
+        margin-left: 0.5rem;
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+      }
     </style>
+    <!-- Pinyin-pro local bundle -->
+    <script type="module" src="pinyinPro.js"></script>
+
     <!-- Pull Hanzi Writer from jsdelivr CDN so dist build is not required locally -->
     <script src="hanzi-writer.min.js"></script>
   </head>
@@ -149,6 +169,7 @@
         let writer;
         let currentIndex = 0;
         let chars = [];
+        let pinyins = [];
         const charDataCache = new Map();
 
         function extractChars(str) {
@@ -241,7 +262,7 @@
           chars.forEach((char, idx) => {
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.textContent = char;
+            btn.innerHTML = `<span class="pinyin">${pinyins[idx]}</span><span class="hanzi">${char}</span>`;
             btn.className = 'char-button';
             btn.setAttribute('data-tooltip', `Character ${idx + 1}`);
             btn.addEventListener('click', () => goToCharacter(idx));
@@ -355,6 +376,7 @@
         form.addEventListener('submit', async (evt) => {
           evt.preventDefault();
           chars = extractChars(sentenceInput.value);
+          pinyins = chars.map(c => (window.pinyinPro || pinyinPro).pinyin(c, { toneType: 'symbol' }));
           await prefetchCharData(chars);
           if (!chars.length) {
             // Show error message with animation

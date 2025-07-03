@@ -64,6 +64,7 @@
     "testEnvironment": "<rootDir>/../jest-jsdom-env"
   },
   "dependencies": {
-    "hanzi-writer-data-jp": "^0.0.2"
+    "hanzi-writer-data-jp": "^0.0.2",
+    "pinyin-pro": "^3.26.0"
   }
 }
